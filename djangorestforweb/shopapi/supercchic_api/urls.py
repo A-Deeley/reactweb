@@ -9,4 +9,5 @@ router.register(r'companies', views.CompanyViewSet)
 
 urlpatterns = [
 	path('', include(router.urls)),
+	path('/shop/products/getCategories', views.
 ]

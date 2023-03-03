@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
 from . import models, serializers
 
 
@@ -8,6 +9,12 @@ class ProductViewSet(viewsets.ModelViewSet):
 	queryset = models.Products.objects.all().order_by('id')
 	serializer_class = serializers.ProductSerializer
 	permission_classes = [permissions.AllowAny]
+	
+	@action(detail=True, methods=['POST'])
+	def getCategories(self, request, *args, **kwargs):
+		departments = request.data
+		queryset = models.Products.objects.filter(department_id__in=departments)
+		return queryset
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):

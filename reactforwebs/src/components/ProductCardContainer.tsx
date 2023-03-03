@@ -50,7 +50,7 @@ export default function ProductCardContainer({ activeFilters }: ProductCardConta
 				}
 			}
 		}
-	}, []);
+	}, [activeFilters]);
 	
 
 	if (loading) {
