@@ -16,4 +16,10 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Products
-		fields='__all__'
+		fields = ('id', 'cup', 'name', 'secondary_name', 'discount_amt', 'discount_type', 'unit_type', 'company', 'department', 'price', 'qty', 'apply_tvq', 'apply_tps', 'image_url')
+
+
+class CartSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Panier
+		fields = '__all__'

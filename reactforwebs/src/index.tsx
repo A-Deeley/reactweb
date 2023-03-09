@@ -10,6 +10,7 @@ import Login from './Auth/Login';
 import SignUp from './Auth/SignUp';
 import Logout from './Auth/Logout';
 import ProtectedRoutes from './ProtectedRoutes';
+import Cart from './components/Cart';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -18,11 +19,12 @@ root.render(
     <React.StrictMode>
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<App />}>
+                <Route path="">
                     {/*<Route path="product/:id" element={< />} />*/}
-                    {/*<Route path="" element={<ProtectedRoutes />}>*/}
-
-                    {/*</Route>*/}
+                    <Route path="/" element={<App />} />
+                    <Route path="" element={<ProtectedRoutes />}>
+                        <Route path="panier" element={<Cart />} />
+                    </Route>
                 </Route>
                 <Route path="/auth" element={<AuthRoutes />}>
                     <Route path="" element={<AuthContainer />}>
@@ -31,7 +33,6 @@ root.render(
                     </Route>
                     <Route path="logout" element={<Logout />} />
                 </Route>
-                <Route path="*" element={<App />} />
             </Routes>
         </BrowserRouter>
     </React.StrictMode>

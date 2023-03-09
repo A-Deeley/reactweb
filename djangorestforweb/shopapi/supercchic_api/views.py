@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
-from rest_framework.decorators import action
 from . import models, serializers
 
 
@@ -10,8 +9,8 @@ class ProductViewSet(viewsets.ModelViewSet):
 	serializer_class = serializers.ProductSerializer
 	permission_classes = [permissions.AllowAny]
 	
-	@action(detail=True, methods=['POST'])
-	def getCategories(self, request, *args, **kwargs):
+	
+	def post(self, request, *args, **kwargs):
 		departments = request.data
 		queryset = models.Products.objects.filter(department_id__in=departments)
 		return queryset
@@ -26,4 +25,10 @@ class DepartmentViewSet(viewsets.ModelViewSet):
 class CompanyViewSet(viewsets.ModelViewSet):
 	queryset = models.Companies.objects.all().order_by('id')
 	serializer_class = serializers.CompanySerializer
+	permission_classes = [permissions.AllowAny]
+
+
+class CartViewSet(viewsets.ModelViewSet):
+	queryset = models.Panier.objects.all().order_by('id')
+	serializer_class = serializers.CartSerializer
 	permission_classes = [permissions.AllowAny]

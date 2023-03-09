@@ -8,5 +8,7 @@ const useAuth = (): boolean => {
 export default function ProtectedRoutes(): JSX.Element | null {
   const isAuth: boolean = useAuth();
 
+  console.log("ProtectedRoutes() returnd " + isAuth);
+
   return isAuth ? <Outlet /> : <Navigate to="/auth/login" />;
 }

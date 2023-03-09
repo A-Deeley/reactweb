@@ -16,6 +16,7 @@ export type ProductCardContainerProps = {
 
 
 export default function ProductCardContainer({ activeFilters }: ProductCardContainerProps) {
+	const productsNoPriceFilterCache = useRef<Product[]>([]);
 	const [products, setProduct] = useState<Product[]>([]);
 	const [loading, setLoading] = useState(true);
 
@@ -24,6 +25,7 @@ export default function ProductCardContainer({ activeFilters }: ProductCardConta
 			ProductDataService.getAll()
 				.then((response) => {
 					console.log('Product data loaded', response.data);
+					productsNoPriceFilterCache.current = response.data.results;
 					setProduct(response.data.results);
 				})
 				.catch((err) => {
@@ -39,7 +41,8 @@ export default function ProductCardContainer({ activeFilters }: ProductCardConta
 					ProductDataService.getAll()
 						.then((response) => {
 							console.log('Product data loaded', response.data);
-							setProduct(response.data.results.filter(item => item.price <= activeFilters.priceRange[activeFilters.priceRange.length - 1] && item.price >= activeFilters.priceRange[0]));
+							productsNoPriceFilterCache.current = response.data.results;
+							setProduct(productsNoPriceFilterCache.current.filter(item => item.price <= activeFilters.priceRange[activeFilters.priceRange.length - 1] && item.price >= activeFilters.priceRange[0]));
 						})
 						.catch((err) => {
 							console.log('ERROR: An error occurred while category data loading', err, err.response);
@@ -47,6 +50,9 @@ export default function ProductCardContainer({ activeFilters }: ProductCardConta
 						.finally(() => {
 							setLoading(false);
 						});
+				}
+				else {
+					setProduct(productsNoPriceFilterCache.current.filter(item => item.price <= activeFilters.priceRange[activeFilters.priceRange.length - 1] && item.price >= activeFilters.priceRange[0]));
 				}
 			}
 		}

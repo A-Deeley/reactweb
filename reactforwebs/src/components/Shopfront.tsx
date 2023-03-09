@@ -38,22 +38,14 @@ export const Shopfront = () => {
 	// Filters loads with everything available and will raise a onFilterChanged when the user modifies
 	return (
 		<>
-		<Grid container spacing={2} sx={{ m: 2}}>
+		<Grid container spacing={2} sx={{ m: 2, width: '75%', marginInline: 'auto'}}>
 			<Grid xs={2}>
 				<Filters onFiltersChanged={onFiltersChanged} />
 			</Grid>
 			<Grid xs={10}>
 				<ProductContainer activeFilters={filters} />
 			</Grid>
-			</Grid>
-			{
-				(userToken !== null)
-					?
-					<Fab sx={fabStyle}>
-						<ShoppingCartIcon />
-					</Fab>
-					: <></>
-			}
+		</Grid>
 		
 		</>
 	);

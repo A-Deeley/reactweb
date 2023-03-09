@@ -5,42 +5,45 @@
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+from django.conf import settings
 from django.db import models
 from django_mysql.models import Bit1BooleanField
 
 
 class Companies(models.Model):
     name = models.CharField(unique=True, max_length=255)
-
-    class Meta:
-        managed = False
-        db_table = 'companies'
+    
+    def __str__(self):
+        return self.name
 
 
 class Departments(models.Model):
     name = models.CharField(unique=True, max_length=255)
 
-    class Meta:
-        managed = False
-        db_table = 'departments'
+    def __str__(self):
+        return self.name
 
 
 class Products(models.Model):
     company = models.ForeignKey(Companies, models.DO_NOTHING, blank=True, null=True)
+    image = models.ImageField(upload_to='product_img/')
     department = models.ForeignKey(Departments, models.DO_NOTHING, blank=True, null=True)
-    name = models.CharField(unique=True, max_length=50)
+    name = models.CharField(unique=False, blank=False, max_length=50)
+    secondary_name = models.CharField(unique=False, max_length=50)
     qty = models.FloatField(blank=True, null=True)
     cup = models.CharField(unique=True, max_length=12, blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
     unit_type = models.CharField(max_length=50)
     apply_tps = Bit1BooleanField()  # This field type is a guess.
     apply_tvq = Bit1BooleanField()  # This field type is a guess.
-    discount_type = Bit1BooleanField()  # This field type is a guess.
+    discount_type = models.SmallIntegerField(blank=True, null=True)
     discount_amt = models.FloatField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'products'
+    def image_url(self):
+        return self.image.url
+
+    def __str__(self):
+        return self.name
 
 
 class TransactionRows(models.Model):
@@ -52,15 +55,22 @@ class TransactionRows(models.Model):
     tvq_unit = models.FloatField(blank=True, null=True)
     qty_unit = models.FloatField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'transaction_rows'
-
 
 class Transactions(models.Model):
     date = models.DateTimeField()
 
-    class Meta:
-        managed = False
-        db_table = 'transactions'
+    def __str__(self):
+        return "Transaction du " + self.date
+
+
+class Panier(models.Model):
+    owner = models.OneToOneField(settings.AUTH_USER_MODEL, models.DO_NOTHING, blank=False, null=False)
+
+    def __str__(self):
+        return "Panier de " + self.owner.username
+
+
+class PanierRow(models.Model):
+    product = models.ForeignKey(Products, models.DO_NOTHING, blank=False, null=False)
+    panier = models.ForeignKey(Panier, models.DO_NOTHING, )
 

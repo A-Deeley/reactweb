@@ -47,7 +47,7 @@ export default function SignUp(): JSX.Element {
     password: yup
       .string()
       .required("Le mot de passe est obligatoire")
-      .max(100, "Le mot de passe doit contenir au plus 100 caractères")
+      .max(100, "Le mot de passe ne doit pas dépasser 100 caractères")
       .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
     confirmPassword: yup
       .string()

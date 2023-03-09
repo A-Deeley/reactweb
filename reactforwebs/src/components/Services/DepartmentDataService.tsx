@@ -1,4 +1,4 @@
-﻿import { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import axiosInstance from 'axios';
 import Department from '../Interfaces/Department';
 import IDepartmentData from '../Interfaces/IDepartmentData';
