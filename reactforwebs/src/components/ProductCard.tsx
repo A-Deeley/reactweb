@@ -71,7 +71,7 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 			</CardActionArea>
 			<Tooltip title="Ajouter au panier">
 				<Button onClick={handleAddToCartClick} sx={{ backgroundColor: '#ed3024', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '50px', ":hover": { backgroundColor: '#b51a10'}}}>
-					<AddShoppingCartIcon sx={{ color: '#FDD100'}}/>
+					<span style={{ color: 'white'}}>Ajouter</span><AddShoppingCartIcon sx={{ color: '#FDD100'}}/>
 				</Button>
 			</Tooltip>
 		</Card>;
