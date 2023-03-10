@@ -7,6 +7,9 @@ import { useEffect, useRef, useState } from 'react';
 import ProductDataService from './Services/ProductDataService';
 import { Box, Skeleton } from '@mui/material';
 import IFilters from './Interfaces/IFilters';
+import CartDataService from './Services/CartDataService';
+import { useSnackbar } from 'notistack';
+import Cart from './Interfaces/Cart';
 
 export type ProductCardContainerProps = {
 	activeFilters: IFilters | null | undefined,
@@ -18,7 +21,7 @@ export type ProductCardContainerProps = {
 export default function ProductCardContainer({ activeFilters }: ProductCardContainerProps) {
 	const productsNoPriceFilterCache = useRef<Product[]>([]);
 	const [products, setProduct] = useState<Product[]>([]);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState<boolean>(true);
 
 	useEffect(() => {
 		if (activeFilters === null || activeFilters === undefined) {

@@ -10,4 +10,5 @@ router.register(r'carts', views.CartViewSet)
 
 urlpatterns = [
 	path('', include(router.urls)),
+	path('react-cart', views.ReactCartView.as_view()),
 ]

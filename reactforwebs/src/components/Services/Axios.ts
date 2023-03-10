@@ -30,11 +30,18 @@ export const unsetLocalToken = (): void => {
   axiosInstance.defaults.headers.Authorization = null;
 }
 
+axiosInstance.interceptors.request.use((request) => {
+  console.log('request', request.headers);
+  return request;
+});
+
 axiosInstance.interceptors.response.use(
   (response) => {
+    console.log('response');
     return response;
   },
   (error) => {
+    console.log('response error');
     if (axios.isAxiosError(error)) {
       if (error.response) {
         if (error.response.status === 401) {

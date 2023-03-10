@@ -6,6 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models
 from django_mysql.models import Bit1BooleanField
 
@@ -64,7 +65,10 @@ class Transactions(models.Model):
 
 
 class Panier(models.Model):
-    owner = models.OneToOneField(settings.AUTH_USER_MODEL, models.DO_NOTHING, blank=False, null=False)
+    owner = models.ForeignKey(User, models.DO_NOTHING, blank=False, null=False)
+
+    # def __init__(self, user):
+    #     self.owner = user
 
     def __str__(self):
         return "Panier de " + self.owner.username
@@ -72,5 +76,9 @@ class Panier(models.Model):
 
 class PanierRow(models.Model):
     product = models.ForeignKey(Products, models.DO_NOTHING, blank=False, null=False)
-    panier = models.ForeignKey(Panier, models.DO_NOTHING, )
+    panier = models.ForeignKey(Panier, models.DO_NOTHING, related_name='rows')
+    quantity = models.FloatField(blank=False, null=False)
+
+    def __str__(self):
+        return str(self.quantity) + "x " + self.product.name
 

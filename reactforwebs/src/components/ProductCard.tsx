@@ -8,6 +8,7 @@ import { Box, Button, CardActionArea, CardActions, Divider, Grid, IconButton, To
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import LoginIcon from '@mui/icons-material/Login';
+import CartDataService from './Services/CartDataService';
 
 export type ProductCardProps = {
 	product: IProductData
@@ -49,7 +50,8 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 	}
 
 	const handleAddToCartClick = () => {
-		
+		console.log(`Adding ${product.name} to the cart.`);
+		CartDataService.update(product.id, 1).then((response) => console.log(response)).catch((err) => console.log(err));
 	}
 
 
