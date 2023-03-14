@@ -70,3 +70,23 @@ class ReactCartView(APIView):
 		cart.save()
 		return Response(status=status.HTTP_202_ACCEPTED)
 
+	def get(self, request):
+
+		cart = models.Panier.objects.filter(owner_id=1).first()
+		if (cart is None):
+			cart = models.Panier(
+				owner = request.user
+			)
+
+		product_ids = cart.rows.values('product_id')
+		products = models.Products.objects.filter(id__in=product_ids)
+
+		product_quantities = []
+
+		for row in cart.rows:
+			product_quantities += {}
+
+		return Response(status=status.HTTP_200_OK)
+
+		
+

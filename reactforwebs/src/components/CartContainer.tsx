@@ -14,7 +14,7 @@ export default function CartContainer() {
     };
 
     useEffect(() => {
-        CartDataService.get(1)
+        CartDataService.get()
         .then((response) => {
             console.log("cart data loaded", response.data);
             setCartContents(response.data);

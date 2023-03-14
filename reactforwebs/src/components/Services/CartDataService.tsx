@@ -10,8 +10,8 @@ const rootPath = 'http://localhost:8000/shop/carts';
 const getAll = (): Promise<AxiosResponse<ICartData>> =>
     axiosInstance.get<unknown, AxiosResponse<ICartData>>(rootPath);
 
-const get = (id: number): Promise<AxiosResponse<Cart>> =>
-    axiosInstance.get<unknown, AxiosResponse<Cart>>(`${rootPath}/${id}`);
+const get = (): Promise<AxiosResponse<Cart>> =>
+    axiosInstance.get<unknown, AxiosResponse<Cart>>(`http://localhost:8000/shop/react-cart`);
 
 
 const update = (productId: number, qty: number): Promise<AxiosResponse<Cart>> =>{
