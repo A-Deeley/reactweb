@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": false,
-            "program": "C:/Users/Kuronai/Desktop/ReactApp/djangorestforweb/shopapi/manage.py",
+            "program": "${workspaceRoot}/djangorestforweb/shopapi/manage.py",
             "args": [
                 "runserver",
                 "127.0.0.1:8000",                

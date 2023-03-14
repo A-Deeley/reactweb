@@ -1,11 +1,13 @@
-export default interface Cart {
+import Product from "./Product"
+
+export interface Cart {
     id: number,
     owner: number,
     rows: CartRow[]
 }
 
-interface CartRow {
+export interface CartRow {
     id: number,
-    product: number,
+    product: Product,
     quantity: number
 }

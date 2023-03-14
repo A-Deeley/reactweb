@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import CartDataService from "./Services/CartDataService";
-import Cart from "./Interfaces/Cart";
+import { CartRow } from "./Interfaces/Cart";
 import Product from "./Interfaces/Product";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 
 export default function CartContainer() {
-    const [cartContents, setCartContents] = useState<Cart | null>(null);
+    const [cartContents, setCartContents] = useState<CartRow[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true); 
     const navigate: NavigateFunction = useNavigate();
 
@@ -27,22 +27,28 @@ export default function CartContainer() {
         return <div>Loading!</div>
     }
     else{
-        return (
-        <>
+        console.log("finished loading. Content to display is", cartContents);
+        const jsx = 
         <table>
             <th>rowId</th>
+            <th>img</th>
             <th>productId</th>
             <th>productQty</th>
-            {cartContents?.rows.map((row) => {
+            {cartContents?.map((row) => {
+                console.log("hi", row);
                 return <tr>
                     <td>{row.id}</td>
-                    <td>{row.product}</td>
+                    <td><img src={`http://localhost:8000${row.product.image_url}`}/></td>
+                    <td>{row.product.name}</td>
                     <td>{row.quantity}</td>
                 </tr>
             })}
-        </table>
-        <button onClick={goBack}>go back</button>
-        </>
-        );
+        </table>;
+
+        return (
+            <>
+                {jsx}
+                <button onClick={goBack}>go back</button>
+            </>);
     }
 }

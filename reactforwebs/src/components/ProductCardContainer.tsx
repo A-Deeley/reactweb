@@ -9,7 +9,7 @@ import { Box, Skeleton } from '@mui/material';
 import IFilters from './Interfaces/IFilters';
 import CartDataService from './Services/CartDataService';
 import { useSnackbar } from 'notistack';
-import Cart from './Interfaces/Cart';
+import { Cart } from './Interfaces/Cart';
 
 export type ProductCardContainerProps = {
 	activeFilters: IFilters | null | undefined,

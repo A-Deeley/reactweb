@@ -78,15 +78,11 @@ class ReactCartView(APIView):
 				owner = request.user
 			)
 
-		product_ids = cart.rows.values('product_id')
-		products = models.Products.objects.filter(id__in=product_ids)
+		cartRows = cart.rows.all()
+		serializer = serializers.CartRowSerializer(cartRows.all(), many=True)
+		#products = models.Products.objects.filter(id__in=product_ids)
 
-		product_quantities = []
-
-		for row in cart.rows:
-			product_quantities += {}
-
-		return Response(status=status.HTTP_200_OK)
+		return Response(serializer.data, status=status.HTTP_200_OK)
 
 		
 

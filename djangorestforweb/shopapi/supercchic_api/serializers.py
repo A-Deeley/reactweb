@@ -20,9 +20,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class CartRowSerializer(serializers.ModelSerializer):
+	product = ProductSerializer(read_only=True)
+
 	class Meta:
 		model = PanierRow
-		fields = '__all__'
+		fields = ('id', 'product', 'quantity')
 
 class CartSerializer(serializers.ModelSerializer):
 	rows = CartRowSerializer(many=True, read_only=True)

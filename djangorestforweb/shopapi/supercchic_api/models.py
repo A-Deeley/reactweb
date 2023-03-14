@@ -75,7 +75,7 @@ class Panier(models.Model):
 
 
 class PanierRow(models.Model):
-    product = models.ForeignKey(Products, models.DO_NOTHING, blank=False, null=False)
+    product = models.ForeignKey(Products, models.DO_NOTHING, blank=False, null=False, related_name='product')
     panier = models.ForeignKey(Panier, models.DO_NOTHING, related_name='rows')
     quantity = models.FloatField(blank=False, null=False)
 
