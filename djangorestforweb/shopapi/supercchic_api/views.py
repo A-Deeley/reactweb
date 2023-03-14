@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework import viewsets, permissions
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from . import models, serializers
 
@@ -33,28 +34,39 @@ class CartViewSet(viewsets.ModelViewSet):
 
 
 class ReactCartView(APIView):
-	permission_classes= [permissions.IsAuthenticated]
+	permission_classes= [permissions.AllowAny]
 
 	def post(self, request):
 		print("got to start of update")
 		bodyJson = request.data
 
-		print(request.user)
-		cart = models.Panier.objects.filter(owner=request.user).first()
+		cart = models.Panier.objects.filter(owner_id=bodyJson['owner']).first()
 		if (cart is None):
-			cart = Panier(
+			cart = models.Panier(
 				owner = request.user
 			)
-			cart.save()
-		print(bodyJson['product'])
-		product = models.Products.objects.filter(id=bodyJson.product).first()
+		
+		product = models.Products.objects.filter(id=bodyJson['product']).first()
 
-		print(product)
+		
 		if (product is None):
 			return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+		existingRow = cart.rows.filter(panier_id=cart.id, product_id=product).first()
 		
-		cart.rows.append(PanierRow(product, bodyJson.quantity))
+		if (existingRow is None):
+			print("adding non-existing row")
+			existingRow = models.PanierRow(
+				panier = cart,
+				product_id = product.id,
+				quantity = bodyJson['quantity']
+			)
+		else:
+			print("updating existing row")
+			existingRow.quantity += bodyJson['quantity']
+
+		existingRow.save()
 		cart.save()
 		return Response(status=status.HTTP_202_ACCEPTED)
-	
+

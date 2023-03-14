@@ -17,7 +17,7 @@ const get = (id: number): Promise<AxiosResponse<Cart>> =>
 const update = (productId: number, qty: number): Promise<AxiosResponse<Cart>> =>{
 
     console.log("calling update");
-    return axiosInstance.post<unknown, AxiosResponse<Cart>>(`http://localhost:8000/shop/react-cart`, {product: productId, quantity: qty});
+    return axiosInstance.post<unknown, AxiosResponse<Cart>>(`http://localhost:8000/shop/react-cart`, {product: productId, quantity: qty, owner: 1});
 }
 
 const create = (data: Cart): Promise<AxiosResponse<Cart>> =>

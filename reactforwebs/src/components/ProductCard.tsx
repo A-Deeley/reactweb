@@ -51,7 +51,8 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 
 	const handleAddToCartClick = () => {
 		console.log(`Adding ${product.name} to the cart.`);
-		CartDataService.update(product.id, 1).then((response) => console.log(response)).catch((err) => console.log(err));
+		CartDataService.update(product.id, 1).then((response) => console.log("success", response)).catch((err) => console.log(err));
+		navigate("/panier")
 	}
 
 

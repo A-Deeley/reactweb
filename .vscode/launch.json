@@ -1,0 +1,23 @@
+{
+    // Utilisez IntelliSense pour en savoir plus sur les attributs possibles.
+    // Pointez pour afficher la description des attributs existants.
+    // Pour plus d'informations, visitez : https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Django",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "program": "C:/Users/Kuronai/Desktop/ReactApp/djangorestforweb/shopapi/manage.py",
+            "args": [
+                "runserver",
+                "127.0.0.1:8000",                
+            ],
+            "debugOptions": [
+                "RedirectOutput",
+                "DjangoDebugging"
+            ]
+        }
+    ]
+}

@@ -10,7 +10,7 @@ import Login from './Auth/Login';
 import SignUp from './Auth/SignUp';
 import Logout from './Auth/Logout';
 import ProtectedRoutes from './ProtectedRoutes';
-import Cart from './components/Cart';
+import Cart from './components/CartContainer';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
