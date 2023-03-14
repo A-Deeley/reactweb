@@ -1,9 +1,9 @@
 import { AxiosResponse } from 'axios';
-import axiosInstance from 'axios';
+import axiosInstance from './Axios';
 import Department from '../Interfaces/Department';
 import IDepartmentData from '../Interfaces/IDepartmentData';
 
-const rootPath = 'http://localhost:8000/shop/departments';
+const rootPath = 'shop/departments';
 
 const getAll = (): Promise<AxiosResponse<IDepartmentData>> =>
     axiosInstance.get<unknown, AxiosResponse<IDepartmentData>>(rootPath);

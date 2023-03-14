@@ -27,7 +27,6 @@ export default function CartContainer() {
         return <div>Loading!</div>
     }
     else{
-        console.log("finished loading. Content to display is", cartContents);
         const jsx = 
         <table>
             <th>rowId</th>
@@ -35,7 +34,6 @@ export default function CartContainer() {
             <th>productId</th>
             <th>productQty</th>
             {cartContents?.map((row) => {
-                console.log("hi", row);
                 return <tr>
                     <td>{row.id}</td>
                     <td><img src={`http://localhost:8000${row.product.image_url}`}/></td>

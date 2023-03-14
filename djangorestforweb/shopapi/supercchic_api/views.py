@@ -40,7 +40,8 @@ class ReactCartView(APIView):
 		print("got to start of update")
 		bodyJson = request.data
 
-		cart = models.Panier.objects.filter(owner_id=bodyJson['owner']).first()
+
+		cart = models.Panier.objects.filter(owner=request.user).first()
 		if (cart is None):
 			cart = models.Panier(
 				owner = request.user
@@ -72,7 +73,7 @@ class ReactCartView(APIView):
 
 	def get(self, request):
 
-		cart = models.Panier.objects.filter(owner_id=1).first()
+		cart = models.Panier.objects.filter(owner=request.user).first()
 		if (cart is None):
 			cart = models.Panier(
 				owner = request.user

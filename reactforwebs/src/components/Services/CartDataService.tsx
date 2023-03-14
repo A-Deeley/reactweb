@@ -1,23 +1,23 @@
 import { AxiosResponse } from 'axios';
-import axiosInstance from 'axios';
+import axiosInstance from './Axios';
 import Department from '../Interfaces/Department';
 import IDepartmentData from '../Interfaces/IDepartmentData';
 import ICartData from '../Interfaces/ICartData';
 import { Cart, CartRow } from '../Interfaces/Cart';
 
-const rootPath = 'http://localhost:8000/shop/carts';
+const rootPath = 'shop/carts';
 
 const getAll = (): Promise<AxiosResponse<ICartData>> =>
     axiosInstance.get<unknown, AxiosResponse<ICartData>>(rootPath);
 
 const get = (): Promise<AxiosResponse<CartRow[]>> =>
-    axiosInstance.get<unknown, AxiosResponse<CartRow[]>>(`http://localhost:8000/shop/react-cart`);
+    axiosInstance.get<unknown, AxiosResponse<CartRow[]>>(`shop/react-cart`);
 
 
 const update = (productId: number, qty: number): Promise<AxiosResponse<Cart>> =>{
 
-    console.log("calling update");
-    return axiosInstance.post<unknown, AxiosResponse<Cart>>(`http://localhost:8000/shop/react-cart`, {product: productId, quantity: qty, owner: 1});
+    console.log("calling update", axiosInstance);
+    return axiosInstance.post<unknown, AxiosResponse<Cart>>(`shop/react-cart`, {product: productId, quantity: qty});
 }
 
 const create = (data: Cart): Promise<AxiosResponse<Cart>> =>

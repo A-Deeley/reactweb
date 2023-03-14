@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
-import axiosInstance, { setLocalToken, unsetLocalToken } from './Axios';
 import IUserData, { IAuthData } from '../Interfaces/IUserData';
+import axiosInstance, { setLocalToken, unsetLocalToken } from './Axios';
 
 const login = (username: string, password: string): Promise<boolean> => {
   const promise = new Promise<boolean>((resolve, reject) => {

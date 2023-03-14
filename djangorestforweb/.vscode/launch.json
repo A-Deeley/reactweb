@@ -1,0 +1,22 @@
+{
+    // Utilisez IntelliSense pour en savoir plus sur les attributs possibles.
+    // Pointez pour afficher la description des attributs existants.
+    // Pour plus d'informations, visitez : https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug DjangoREST",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/shopapi/manage.py",
+            "args": [
+                "runserver",
+                "127.0.0.1:8000",                
+            ],
+            "debugOptions": [
+                "RedirectOutput",
+                "DjangoDebugging"
+            ]
+        }
+    ]
+  }

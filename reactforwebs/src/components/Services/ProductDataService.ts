@@ -1,9 +1,9 @@
 import { AxiosResponse } from 'axios';
-import axiosInstance from 'axios';
+import axiosInstance from './Axios';
 import IProductData from '../Interfaces/IProductData';
 import Product from '../Interfaces/Product';
 
-const rootPath = 'http://localhost:8000/shop/products';
+const rootPath = 'shop/products';
 
 const getAll = (): Promise<AxiosResponse<IProductData>> =>
     axiosInstance.get<unknown, AxiosResponse<IProductData>>(rootPath);

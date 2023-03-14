@@ -19,12 +19,10 @@ root.render(
     <React.StrictMode>
         <BrowserRouter>
             <Routes>
-                <Route path="">
+                <Route path="/" element={<App />} />
                     {/*<Route path="product/:id" element={< />} />*/}
-                    <Route path="/" element={<App />} />
-                    <Route path="" element={<ProtectedRoutes />}>
-                        <Route path="panier" element={<Cart />} />
-                    </Route>
+                <Route path="" element={<ProtectedRoutes />}>
+                    <Route path="panier" element={<Cart />} />
                 </Route>
                 <Route path="/auth" element={<AuthRoutes />}>
                     <Route path="" element={<AuthContainer />}>
