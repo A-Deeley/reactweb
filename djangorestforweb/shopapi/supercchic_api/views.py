@@ -80,7 +80,7 @@ class ReactCartView(APIView):
 			)
 
 		cartRows = cart.rows.all()
-		serializer = serializers.CartRowSerializer(cartRows.all(), many=True)
+		serializer = serializers.CartRowSerializer(cartRows.all().order_by('-quantity'), many=True)
 		#products = models.Products.objects.filter(id__in=product_ids)
 
 		return Response(serializer.data, status=status.HTTP_200_OK)

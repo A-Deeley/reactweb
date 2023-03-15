@@ -16,7 +16,6 @@ const get = (): Promise<AxiosResponse<CartRow[]>> =>
 
 const update = (productId: number, qty: number): Promise<AxiosResponse<Cart>> =>{
 
-    console.log("calling update", axiosInstance);
     return axiosInstance.post<unknown, AxiosResponse<Cart>>(`shop/react-cart`, {product: productId, quantity: qty});
 }
 

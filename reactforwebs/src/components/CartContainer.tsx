@@ -3,11 +3,15 @@ import CartDataService from "./Services/CartDataService";
 import { CartRow } from "./Interfaces/Cart";
 import Product from "./Interfaces/Product";
 import { NavigateFunction, useNavigate } from "react-router-dom";
+import { Grid } from "@mui/material";
+import CartContents from "./CartContents";
+import Checkout from "./Checkout";
 
 export default function CartContainer() {
-    const [cartContents, setCartContents] = useState<CartRow[] | null>(null);
+    const [cartContent, setCartContents] = useState<CartRow[]>([]);
     const [loading, setLoading] = useState<boolean>(true); 
     const navigate: NavigateFunction = useNavigate();
+    
 
     const goBack = () => {
         navigate("/");
@@ -20,33 +24,18 @@ export default function CartContainer() {
             setCartContents(response.data);
         })
         .catch((err) => {console.log("error loading cart", err);})
-        .finally(() => {setLoading(false)});
     }, []);
     
-    if(loading){
-        return <div>Loading!</div>
-    }
-    else{
-        const jsx = 
-        <table>
-            <th>rowId</th>
-            <th>img</th>
-            <th>productId</th>
-            <th>productQty</th>
-            {cartContents?.map((row) => {
-                return <tr>
-                    <td>{row.id}</td>
-                    <td><img src={`http://localhost:8000${row.product.image_url}`}/></td>
-                    <td>{row.product.name}</td>
-                    <td>{row.quantity}</td>
-                </tr>
-            })}
-        </table>;
-
-        return (
-            <>
-                {jsx}
-                <button onClick={goBack}>go back</button>
+        return (<>
+            <Grid container spacing={2} sx={{ marginTop: '1em', maxWidth: '75%', marginInline: 'auto'}}>
+                <Grid xs={8}>
+                    <CartContents cart={cartContent} handleCartUpdate={setCartContents}/>
+                </Grid>
+                <Grid xs={1} />
+                <Grid xs={3}>
+                    <Checkout cart={cartContent}/>
+                </Grid>
+            </Grid>
+            
             </>);
     }
-}

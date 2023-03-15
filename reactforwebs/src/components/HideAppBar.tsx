@@ -35,7 +35,7 @@ export default function ButtonAppBar() {
 		<Box sx={{ flexGrow: 1, background: '#ed3024', boxShadow: '0px 1px 10px 1px black' }}>
 			<AppBar position="static" sx={{ width: '75%', marginInline: 'auto', boxShadow: 'none' }}>
 				<Toolbar sx={{ justifyContent: 'space-between', m: 0, p: 0, }} style={{ backgroundColor: '#ed3024'}}>
-					<a href='#'><img src='Logo.png' /></a>
+					<a href='/'><img src='Logo.png' /></a>
 					<Box sx={{ display: 'flex', orientation: 'row', gap: 2 }}>
 						{(userToken !== null)? <Tooltip title="Mon Panier">
 							<IconButton sx={{ "&:hover": { backgroundColor: '#00994c' }, backgroundColor: '#00994c', border: 1, color: 'black' }} onClick={cartBtnClicked}><ShoppingCartIcon /></IconButton>

@@ -9,6 +9,7 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import LoginIcon from '@mui/icons-material/Login';
 import CartDataService from './Services/CartDataService';
+import { SnackbarProvider, useSnackbar } from 'notistack'
 
 export type ProductCardProps = {
 	product: IProductData
@@ -18,6 +19,7 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 
 	console.log(product.image_url);
 	const navigate: NavigateFunction = useNavigate();
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 	const userToken: string | null = localStorage.getItem('demo_access_token');
 	const moneyFormatter = new Intl.NumberFormat('en-CA', {
 		style: 'currency',
@@ -25,6 +27,7 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 	})
 
 	let realPrice = <Box sx={{ height: '100%'}}><Typography display="inline" sx={{ color: 'white'}}>.</Typography><Typography>{moneyFormatter.format(product.price)}</Typography></Box>;
+	const secondaryText = product.secondary_name.length > 0 ? <Typography sx={{ whiteSpace: 'nowrap', paddingInline: '1em', color: 'grey' }}>{product.secondary_name}</Typography> : <></>;
 
 	if (product.discount_type == 1){
 		realPrice = 
@@ -50,9 +53,9 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 	}
 
 	const handleAddToCartClick = () => {
-		console.log(`Adding ${product.name} to the cart.`);
+		console.log(`Adding product to the cart.`, product);
 		CartDataService.update(product.id, 1).then((response) => console.log("success", response)).catch((err) => console.log(err));
-		navigate("/panier")
+		enqueueSnackbar(`${product.name} ajouté au panier!`,  {variant: "success"});
 	}
 
 
@@ -61,6 +64,7 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 	<CardActionArea sx={{ height: '100%'}} onClick={handleViewClick}>
 		<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`http://localhost:8000${product.image_url}`}/>
 		<Typography variant='h6' sx={{textWrap: 'wrap' }}>{product.name}</Typography>
+		{secondaryText}
 		{realPrice}
 	</CardActionArea>
 </Card>
@@ -69,7 +73,7 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 			<CardActionArea sx={{ height: '100%'}} onClick={handleViewClick}>
 				<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`http://localhost:8000${product.image_url}`}/>
 				<Typography variant='h6' sx={{textWrap: 'wrap' }}>{product.name}</Typography>
-				{product.secondary_name.length > 0 ? <Typography sx={{textWrap: 'wrap', color: 'grey' }}>{product.secondary_name}</Typography> : <></>}
+				{secondaryText}
 				{realPrice}
 			</CardActionArea>
 			<Tooltip title="Ajouter au panier">

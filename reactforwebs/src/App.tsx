@@ -3,6 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 import Header from './components/HideAppBar';
 import {Shopfront} from './components/Shopfront';
+import { Outlet } from 'react-router-dom';
+import { SnackbarProvider } from 'notistack';
 
 
 function App(): JSX.Element {
@@ -10,8 +12,10 @@ function App(): JSX.Element {
     
     return (
       <div className="App">
+        <SnackbarProvider maxSnack={3}>
           <Header />
-          <Shopfront />
+          <Outlet />
+        </SnackbarProvider>
     </div>
   );
 }
