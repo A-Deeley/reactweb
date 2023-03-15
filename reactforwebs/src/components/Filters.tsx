@@ -181,7 +181,7 @@ export default function Filters({ onFiltersChanged }: FilterProps) {
             <Box sx={{ width: '100%', maxWidth: 360 }}>
                 <Divider textAlign="left"><Typography sx={{ textAlign: 'start', fontWeight: 'bold' }}>Aucun départements trouvés</Typography></Divider>
                 <Divider textAlign="left"><Typography sx={{ textAlign: 'start', fontWeight: 'bold' }}>Prix ($)</Typography></Divider>
-                <Slider valueLabelDisplay="auto" style={{ marginTop: 5, height: 8, width: '90%' }} value={priceFilters} valueLabelFormat={value => <div>${value}</div>} onChange={handlePriceSlider} marks={marks}/>
+                <Slider valueLabelDisplay="auto" style={{ marginTop: 5, height: 8, width: '90%', color: '#00994c' }} value={priceFilters} valueLabelFormat={value => <div>${value}</div>} onChange={handlePriceSlider} marks={marks}/>
                 <Button variant="contained" onClick={onApplyClicked} sx={{ backgroundColor: '#ed3024', ':hover': { backgroundColor: '#b51a10'}}}>Appliquer</Button>
             </Box>
             );

@@ -33,7 +33,7 @@ class CartViewSet(viewsets.ModelViewSet):
 	
 
 
-class ReactCartView(APIView):
+class ReactCartEditView(APIView):
 	permission_classes= [permissions.AllowAny]
 
 	def post(self, request):
@@ -46,6 +46,7 @@ class ReactCartView(APIView):
 			cart = models.Panier(
 				owner = request.user
 			)
+			cart.save()
 		
 		product = models.Products.objects.filter(id=bodyJson['product']).first()
 
@@ -85,5 +86,22 @@ class ReactCartView(APIView):
 
 		return Response(serializer.data, status=status.HTTP_200_OK)
 
-		
 
+class ReactCartDeleteView(APIView):
+
+	def post(self, request):
+		rowId = request.data['row']
+
+		cart = models.Panier.objects.get(owner=request.user)
+
+		if (cart is None):
+			return Response(status=status.HTTP_200_OK)
+
+		cartRow = cart.rows.get(id=rowId)
+		print(cartRow)
+
+		cartRow.delete()
+		
+		serializer = serializers.CartRowSerializer(cart.rows.all(), many=True)
+
+		return Response(serializer.data ,status=status.HTTP_200_OK)

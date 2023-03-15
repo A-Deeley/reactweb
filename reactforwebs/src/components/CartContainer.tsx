@@ -7,6 +7,7 @@ import { Grid } from "@mui/material";
 import CartContents from "./CartContents";
 import Checkout from "./Checkout";
 
+
 export default function CartContainer() {
     const [cartContent, setCartContents] = useState<CartRow[]>([]);
     const [loading, setLoading] = useState<boolean>(true); 

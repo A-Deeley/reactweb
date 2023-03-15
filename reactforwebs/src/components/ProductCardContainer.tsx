@@ -2,14 +2,15 @@ import * as React from 'react'
 import Container from '@mui/material/Container';
 import Product from './Interfaces/Product';
 import ProductCard, { ProductCardProps } from './ProductCard';
-import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import ProductDataService from './Services/ProductDataService';
-import { Box, Skeleton } from '@mui/material';
+import { Box, Button, Skeleton, Typography } from '@mui/material';
 import IFilters from './Interfaces/IFilters';
 import CartDataService from './Services/CartDataService';
 import { useSnackbar } from 'notistack';
 import { Cart } from './Interfaces/Cart';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 export type ProductCardContainerProps = {
 	activeFilters: IFilters | null | undefined,
@@ -22,6 +23,7 @@ export default function ProductCardContainer({ activeFilters }: ProductCardConta
 	const productsNoPriceFilterCache = useRef<Product[]>([]);
 	const [products, setProduct] = useState<Product[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
+	const navigate: NavigateFunction = useNavigate();
 
 	useEffect(() => {
 		if (activeFilters === null || activeFilters === undefined) {
@@ -70,11 +72,21 @@ export default function ProductCardContainer({ activeFilters }: ProductCardConta
 		);
 	}
 
-	return (
-		<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
-		{products.map((product) => {
-			return <ProductCard product={product} />
-		})}
-		</Box>
-	);
+	if (products.length > 0){
+		return (
+			<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+			{products.map((product) => {
+				return <ProductCard product={product} />
+			})}
+			</Box>
+		);
+	}
+	else {
+		return (
+			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+				<Typography sx={{ fontWeight: 'bold'}}>Aucun article trouvé :(</Typography>
+				<Button variant='contained' onClick={() => window.location.reload()}>Rafraichir<RefreshIcon /></Button>
+			</Box>
+		);
+	}
 }

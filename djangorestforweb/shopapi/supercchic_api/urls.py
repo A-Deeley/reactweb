@@ -10,5 +10,6 @@ router.register(r'carts', views.CartViewSet)
 
 urlpatterns = [
 	path('', include(router.urls)),
-	path('react-cart', views.ReactCartView.as_view()),
+	path('react-cart/edit', views.ReactCartEditView.as_view()),
+	path('react-cart/delete', views.ReactCartDeleteView.as_view()),
 ]
