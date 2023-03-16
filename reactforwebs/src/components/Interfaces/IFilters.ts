@@ -2,7 +2,7 @@ import Department from "./Department";
 
 interface IFilters {
     departmentFilters: Department[],
-    priceRange: number[],
+    promoFilter: boolean,
 }
 
 export default IFilters;

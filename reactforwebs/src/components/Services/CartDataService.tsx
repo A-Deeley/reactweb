@@ -7,27 +7,27 @@ import { Cart, CartRow } from '../Interfaces/Cart';
 
 const rootPath = 'shop/react-cart';
 
-const getAll = (): Promise<AxiosResponse<ICartData>> =>
-    axiosInstance.get<unknown, AxiosResponse<ICartData>>('shop/carts');
-
 const get = (): Promise<AxiosResponse<CartRow[]>> =>
-    axiosInstance.get<unknown, AxiosResponse<CartRow[]>>(`${rootPath}/edit`);
+    axiosInstance.get<unknown, AxiosResponse<CartRow[]>>(`${rootPath}/getAllRows`);
 
 
-const update = (productId: number, qty: number): Promise<AxiosResponse<Cart>> =>{
+const updateRow = (productId: number, qty: number): Promise<AxiosResponse<Cart>> =>{
 
-    return axiosInstance.post<unknown, AxiosResponse<Cart>>(`${rootPath}/edit`, {product: productId, quantity: qty});
+    return axiosInstance.post<unknown, AxiosResponse<Cart>>(`${rootPath}/editRow`, {product: productId, quantity: qty});
 }
 
 const removeProduct = (rowId: number): Promise<AxiosResponse<CartRow[]>> => {
-    return axiosInstance.post<unknown, AxiosResponse<CartRow[]>>(`${rootPath}/delete`, {row: rowId});
+    return axiosInstance.post<unknown, AxiosResponse<CartRow[]>>(`${rootPath}/deleteRow`, {row: rowId});
 }
 
+const updateCart = (rowQtyJson: string): Promise<AxiosResponse<CartRow[]>> =>
+    axiosInstance.post<unknown, AxiosResponse<CartRow[]>>(`${rootPath}/updateCart`, rowQtyJson);
+
 const CartDataService = {
-    getAll,
     get,
     removeProduct,
-    update,
+    updateRow,
+    updateCart,
 }
 
 export default CartDataService;

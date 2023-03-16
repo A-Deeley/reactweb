@@ -30,23 +30,29 @@ class CartViewSet(viewsets.ModelViewSet):
 	permission_classes = [permissions.AllowAny]
 	http_method_names = ['get']
 
-	
 
+class ReactApiView(APIView):
 
-class ReactCartEditView(APIView):
-	permission_classes= [permissions.AllowAny]
-
-	def post(self, request):
-		print("got to start of update")
-		bodyJson = request.data
-
-
+	def getUserCart(self, request):
 		cart = models.Panier.objects.filter(owner=request.user).first()
 		if (cart is None):
 			cart = models.Panier(
 				owner = request.user
 			)
 			cart.save()
+
+		return cart
+	
+
+
+class ReactCartUpdateRow(ReactApiView):
+	permission_classes= [permissions.AllowAny]
+
+	def post(self, request):
+		print("got to start of update")
+		bodyJson = request.data
+
+		cart = self.getUserCart(request)		
 		
 		product = models.Products.objects.filter(id=bodyJson['product']).first()
 
@@ -72,13 +78,11 @@ class ReactCartEditView(APIView):
 		cart.save()
 		return Response(status=status.HTTP_202_ACCEPTED)
 
+
+class ReactGetAllRows(ReactApiView):
 	def get(self, request):
 
-		cart = models.Panier.objects.filter(owner=request.user).first()
-		if (cart is None):
-			cart = models.Panier(
-				owner = request.user
-			)
+		cart = self.getUserCart(request)
 
 		cartRows = cart.rows.all()
 		serializer = serializers.CartRowSerializer(cartRows.all().order_by('-quantity'), many=True)
@@ -87,7 +91,7 @@ class ReactCartEditView(APIView):
 		return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ReactCartDeleteView(APIView):
+class ReactCartDeleteRow(ReactApiView):
 
 	def post(self, request):
 		rowId = request.data['row']
@@ -95,6 +99,10 @@ class ReactCartDeleteView(APIView):
 		cart = models.Panier.objects.get(owner=request.user)
 
 		if (cart is None):
+			cart = models.Panier(
+				owner = request.user
+			)
+			cart.save()
 			return Response(status=status.HTTP_200_OK)
 
 		cartRow = cart.rows.get(id=rowId)
@@ -105,3 +113,26 @@ class ReactCartDeleteView(APIView):
 		serializer = serializers.CartRowSerializer(cart.rows.all(), many=True)
 
 		return Response(serializer.data ,status=status.HTTP_200_OK)
+	
+
+class ReactCartUpdateCart(ReactApiView):
+
+	def post(self, request):
+		rowQuantities = request.data
+
+		cart = self.getUserCart(request)
+
+		for rowQty in rowQuantities:
+			row = cart.rows.get(id=rowQty['id'])
+			if (rowQty['qty'] <= 0):
+				row.delete()
+			else:
+				row.quantity = rowQty['qty']
+				row.save()
+		
+		cart.save()
+
+		serializer = serializers.CartRowSerializer(cart.rows.all(), many=True)
+
+		return Response(serializer.data ,status=status.HTTP_200_OK)
+

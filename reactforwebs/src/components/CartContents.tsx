@@ -16,15 +16,19 @@ export interface CartContentProps {
 
 export default function CartContents({cart, handleCartUpdate} : CartContentProps) {
         const navigate: NavigateFunction = useNavigate();
+        const [cachedCart, setCartCache] = useState<CartRow[]>([]);
         const { enqueueSnackbar, closeSnackbar } = useSnackbar();
         const [cartChanged, setCartChanged] = useState<boolean>(false);
+        let cartObjects = Object.values(cachedCart);
         const moneyFormatter = new Intl.NumberFormat('en-CA', {
             style: 'currency',
             currency: 'CAD',
-        })
+        })    
 
-        const cachedCartContents = JSON.parse(JSON.stringify(cart));
-    
+        useEffect(() => {
+            setCartCache(JSON.parse(JSON.stringify(cart)));
+            cartObjects = Object.values(cachedCart);
+        }, [cart]);
         
         const handleRemoveClick = (rowId: number) => {
             console.log("Removing row from cart", rowId);
@@ -39,43 +43,54 @@ export default function CartContents({cart, handleCartUpdate} : CartContentProps
         }
 
         const preventNegatives = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, row: CartRow) => {
+            const copy = [...cachedCart];
+            let rowId = copy.findIndex((_row) => _row.id === row.id); 
+            let currentRow = copy[rowId];
             console.log(e.target.value);
             if (e.target.value == ''){
-                e.target.value = `${row.quantity}`;
+                e.target.value = `${currentRow.quantity}`;
                 return;
             }
 
             if (+e.target.value < 0){
-                console.log('negative value');
                 e.target.value = '0';
-                row.quantity = 0;
+                currentRow.quantity = 0;
                 if (!cartChanged){
                     setCartChanged(true);
                 }
+                setCartCache(copy);
                 return;
             }
             
             console.log('updating value');
-            row.quantity = +e.target.value;
+            currentRow.quantity = +e.target.value;
             if (!cartChanged){
                 setCartChanged(true);
             }
+            setCartCache(copy);
         }
 
         const handleResetCart = () => {
-            handleCartUpdate(cachedCartContents);
+            setCartCache(cart);
             setCartChanged(false);
         }
 
         const handleUpdateCart = () => {
-            handleCartUpdate(cart);
-            setCartChanged(false);
+                const newCart = [...cachedCart];
+                const rowQtyPairs = newCart.map((row) => { return {id: row.id, qty: row.quantity}});
+                CartDataService.updateCart(JSON.stringify(rowQtyPairs))
+                .then((response) => {
+                    handleCartUpdate(response.data);
+                    setCartChanged(false);
+                    enqueueSnackbar("Panier mis à jour!", { variant: 'success'});
+                })
+                .catch((err) => {
+                    enqueueSnackbar("Une erreur est survenue.", { variant: 'error'});
+                });
         }
 
         
         let current = 0;
-
-        const cartObjects = Object.values(cart);
 
         if (cartObjects.length > 0){
             return (

@@ -13,7 +13,8 @@ import { Cart } from './Interfaces/Cart';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 export type ProductCardContainerProps = {
-	activeFilters: IFilters | null | undefined,
+	priceFilters: number[],
+	activeFilters: IFilters | undefined | null,
 }
 
 // Load product data here with getFiltered(string json);
