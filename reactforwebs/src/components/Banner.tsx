@@ -10,10 +10,15 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { Tooltip } from '@mui/material';
+import { Badge, Tooltip } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
+import CartDataService from './Services/CartDataService';
+import { CartRow } from './Interfaces/Cart';
+import BadgeContext, { ICartBadgeContext } from './Context/CartBadgeContext';
 
 export default function ButtonAppBar() {
 	const navigate: NavigateFunction = useNavigate();
+	const badgeContext: ICartBadgeContext = useContext(BadgeContext);
 	const userToken: string | null = localStorage.getItem('demo_access_token');
 
 
@@ -38,7 +43,9 @@ export default function ButtonAppBar() {
 					<a href='/'><img src='Logo.png' /></a>
 					<Box sx={{ display: 'flex', orientation: 'row', gap: 2 }}>
 						{(userToken !== null)? <Tooltip title="Mon Panier">
-							<IconButton sx={{ "&:hover": { backgroundColor: '#00994c' }, backgroundColor: '#00994c', border: 1, color: 'black' }} onClick={cartBtnClicked}><ShoppingCartIcon /></IconButton>
+							<Badge badgeContent={badgeContext.cartQuantity} color="success">
+								<IconButton sx={{ "&:hover": { backgroundColor: '#00994c' }, backgroundColor: '#00994c', border: 1, color: 'black' }} onClick={cartBtnClicked}><ShoppingCartIcon /></IconButton>
+							</Badge>
 						</Tooltip> : <></>
 						}
 						

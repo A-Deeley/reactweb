@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Grid, Link, TextField, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { CartRow } from "./Interfaces/Cart";
 import Image from 'material-ui-image'
@@ -8,6 +8,8 @@ import { SnackbarProvider, useSnackbar } from 'notistack'
 import StoreIcon from '@mui/icons-material/Store';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CheckIcon from '@mui/icons-material/Check';
+import BadgeContext, { ICartBadgeContext } from "./Context/CartBadgeContext";
+import ProductDataService from "./Services/ProductDataService";
 
 export interface CartContentProps {
     cart: CartRow[],
@@ -19,6 +21,7 @@ export default function CartContents({cart, handleCartUpdate} : CartContentProps
         const [cachedCart, setCartCache] = useState<CartRow[]>([]);
         const { enqueueSnackbar, closeSnackbar } = useSnackbar();
         const [cartChanged, setCartChanged] = useState<boolean>(false);
+        const badgeContext: ICartBadgeContext = useContext(BadgeContext);
         let cartObjects = Object.values(cachedCart);
         const moneyFormatter = new Intl.NumberFormat('en-CA', {
             style: 'currency',
@@ -33,8 +36,11 @@ export default function CartContents({cart, handleCartUpdate} : CartContentProps
         const handleRemoveClick = (rowId: number) => {
             console.log("Removing row from cart", rowId);
             CartDataService.removeProduct(rowId).then((response) => {
+                const cartRows: CartRow[] = response.data;
                 enqueueSnackbar("Produit retiré", { variant: 'success'});
                 handleCartUpdate(response.data);
+                const cartRowQuantities: number[] = cartRows.map((row) => row.quantity);
+                badgeContext.init(cartRowQuantities);
             })
             .catch((err) => {
                 enqueueSnackbar("Une erreur est survenu.", { variant: 'error' });
@@ -42,7 +48,7 @@ export default function CartContents({cart, handleCartUpdate} : CartContentProps
 
         }
 
-        const preventNegatives = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, row: CartRow) => {
+        const constrainInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, row: CartRow) => {
             const copy = [...cachedCart];
             let rowId = copy.findIndex((_row) => _row.id === row.id); 
             let currentRow = copy[rowId];
@@ -59,6 +65,12 @@ export default function CartContents({cart, handleCartUpdate} : CartContentProps
                     setCartChanged(true);
                 }
                 setCartCache(copy);
+                return;
+            }
+
+            if (+e.target.value > row.product.qty){
+                e.target.value = `${currentRow.quantity}`;
+                enqueueSnackbar("Quantité demandé dépasse le stock disponible.", { variant: 'warning' });
                 return;
             }
             
@@ -78,11 +90,15 @@ export default function CartContents({cart, handleCartUpdate} : CartContentProps
         const handleUpdateCart = () => {
                 const newCart = [...cachedCart];
                 const rowQtyPairs = newCart.map((row) => { return {id: row.id, qty: row.quantity}});
+
                 CartDataService.updateCart(JSON.stringify(rowQtyPairs))
                 .then((response) => {
-                    handleCartUpdate(response.data);
+                    const cartRows: CartRow[] = response.data;
+                    handleCartUpdate(cartRows);
                     setCartChanged(false);
                     enqueueSnackbar("Panier mis à jour!", { variant: 'success'});
+                    const cartRowQuantities: number[] = cartRows.map((row) => row.quantity);
+                    badgeContext.init(cartRowQuantities);
                 })
                 .catch((err) => {
                     enqueueSnackbar("Une erreur est survenue.", { variant: 'error'});
@@ -100,7 +116,37 @@ export default function CartContents({cart, handleCartUpdate} : CartContentProps
                         <Button variant='contained' onClick={handleUpdateCart} disabled={!cartChanged} color='success'><CheckIcon />Mettre à jour</Button>
                     </Grid>
                     {cartObjects.map((row) => {
+                        const rowProduct = row.product;
                         current++;
+                        let rowRealPriceElement = 
+                        <>
+                            <Typography style={{ fontWeight: 'bold'}}>Chaque</Typography>
+                            <Typography>{moneyFormatter.format(rowProduct.price)}</Typography>
+                        </>;
+
+                        let realPrice = rowProduct.price;
+                        if (rowProduct.discount_type > 0){
+                            let realPriceText = moneyFormatter.format(realPrice);
+                            if (rowProduct.discount_type === 1){
+                                realPrice = rowProduct.price - rowProduct.discount_amt;
+                                realPriceText = `${moneyFormatter.format(realPrice)} (-${moneyFormatter.format(rowProduct.discount_amt)})`;
+                            }
+
+                            if (rowProduct.discount_type === 2){
+                                realPrice = rowProduct.price * (1 - rowProduct.discount_amt);
+                                realPriceText = `${moneyFormatter.format(realPrice)} (-${rowProduct.discount_amt * 100}%)`;
+                            }
+
+                            
+
+                            rowRealPriceElement = 
+                            <>
+                                <Typography style={{ fontWeight: 'bold'}}>Chaque</Typography>
+                                <Typography sx={{ }}>{realPriceText}</Typography>
+                                <Typography display="inline" style={{ textDecorationLine: 'line-through', textDecorationStyle: 'solid', textDecorationColor: 'red', fontSize: '10pt'}}>{moneyFormatter.format(row.product.price)}</Typography>
+                            </>
+                        }
+
                         return (
                             <>
                             <Grid key={row.id} container sx={{ marginBlock: '1em', textAlign: 'start' }}>
@@ -113,16 +159,16 @@ export default function CartContents({cart, handleCartUpdate} : CartContentProps
                                         {row.product.secondary_name.length > 0 ? <Typography sx={{textWrap: 'wrap', color: 'grey' }}>{row.product.secondary_name}</Typography> : <></>}
                                     </Grid>
                                     <Grid xs={3}>
-                                        <Typography style={{ fontWeight: 'bold'}}>Chaque</Typography>
-                                        <Typography>{moneyFormatter.format(row.product.price)}</Typography>
+                                        {rowRealPriceElement}                                        
                                     </Grid>
                                     <Grid xs={2} style={{ textAlign: 'center'}}>
                                         <Typography style={{ fontWeight: 'bold'}}>Quantité</Typography>
-                                        <TextField size="small" type="number" value={row.quantity} onChange={e => preventNegatives(e, row)}/>
+                                        <TextField size="small" type="number" value={row.quantity} onChange={e => constrainInput(e, row)}/>
+                                        <Typography style={{ fontStyle: 'italic' }}>(en stock: {row.product.qty})</Typography>
                                     </Grid>
                                     <Grid xs={3} style={{ textAlign: 'end'}}>
-                                       <Typography style={{ fontWeight: 'bold '}}>Total pour l'article</Typography>
-                                        <Typography>{moneyFormatter.format(row.product.price * row.quantity)}</Typography>
+                                        <Typography style={{ fontWeight: 'bold '}}>Total pour l'article</Typography>
+                                        <Typography>{moneyFormatter.format(realPrice * row.quantity)}</Typography>
                                     </Grid>
                                     <Grid style={{ alignItems: 'end', display: 'flex', gap: '1em'}}>
                                         <Typography sx={{ color: 'red', fontStyle: 'italic'}}><Link sx={{ color: 'inherit', cursor: 'pointer'}} underline="hover" onClick={() => handleRemoveClick(row.id)}>enlever</Link></Typography>

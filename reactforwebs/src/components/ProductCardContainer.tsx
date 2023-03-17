@@ -5,12 +5,13 @@ import ProductCard, { ProductCardProps } from './ProductCard';
 import { Navigate, NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import ProductDataService from './Services/ProductDataService';
-import { Box, Button, Skeleton, Typography } from '@mui/material';
+import { Box, Button, Pagination, Skeleton, Typography } from '@mui/material';
 import IFilters from './Interfaces/IFilters';
 import CartDataService from './Services/CartDataService';
 import { useSnackbar } from 'notistack';
 import { Cart } from './Interfaces/Cart';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import IProductData from './Interfaces/IProductData';
 
 export type ProductCardContainerProps = {
 	priceFilters: number[],
@@ -20,17 +21,20 @@ export type ProductCardContainerProps = {
 // Load product data here with getFiltered(string json);
 
 
-export default function ProductCardContainer({ activeFilters }: ProductCardContainerProps) {
+export default function ProductCardContainer({ activeFilters, priceFilters }: ProductCardContainerProps) {
 	const productsNoPriceFilterCache = useRef<Product[]>([]);
 	const [products, setProduct] = useState<Product[]>([]);
+	const [page, setPage] = useState<number>(1);
 	const [loading, setLoading] = useState<boolean>(true);
+	const [productData, setProductData] = useState<IProductData>();
 	const navigate: NavigateFunction = useNavigate();
 
 	useEffect(() => {
 		if (activeFilters === null || activeFilters === undefined) {
-			ProductDataService.getAll()
+			ProductDataService.getAll(page)
 				.then((response) => {
 					console.log('Product data loaded', response.data);
+					setProductData(response.data);
 					productsNoPriceFilterCache.current = response.data.results;
 					setProduct(response.data.results);
 				})
@@ -44,11 +48,11 @@ export default function ProductCardContainer({ activeFilters }: ProductCardConta
 		else {
 			if (activeFilters !== null && activeFilters !== undefined) {
 				if (activeFilters.departmentFilters.findIndex(dept => dept.id === 0) > -1) {
-					ProductDataService.getAll()
+					ProductDataService.getAll(page)
 						.then((response) => {
 							console.log('Product data loaded', response.data);
 							productsNoPriceFilterCache.current = response.data.results;
-							setProduct(productsNoPriceFilterCache.current.filter(item => item.price <= activeFilters.priceRange[activeFilters.priceRange.length - 1] && item.price >= activeFilters.priceRange[0]));
+							setProduct(productsNoPriceFilterCache.current.filter(item => item.price <= priceFilters[priceFilters.length - 1] && item.price >= priceFilters[0]));
 						})
 						.catch((err) => {
 							console.log('ERROR: An error occurred while category data loading', err, err.response);
@@ -58,11 +62,26 @@ export default function ProductCardContainer({ activeFilters }: ProductCardConta
 						});
 				}
 				else {
-					setProduct(productsNoPriceFilterCache.current.filter(item => item.price <= activeFilters.priceRange[activeFilters.priceRange.length - 1] && item.price >= activeFilters.priceRange[0]));
+					setProduct(productsNoPriceFilterCache.current.filter(item => item.price <= priceFilters[priceFilters.length - 1] && item.price >= priceFilters[0]));
 				}
 			}
 		}
-	}, [activeFilters]);
+	}, [activeFilters, priceFilters]);
+
+	const handlePageChange = (page: number) => {
+		setPage(page);
+		console.log(page);
+		ProductDataService.getAll(page)
+				.then((response) => {
+					console.log('Product data loaded', response.data);
+					setProductData(response.data);
+					productsNoPriceFilterCache.current = response.data.results;
+					setProduct(response.data.results);
+				})
+				.catch((err) => {
+					console.log('ERROR: An error occurred while category data loading', err, err.response);
+				});
+	}
 	
 
 	if (loading) {
@@ -74,12 +93,24 @@ export default function ProductCardContainer({ activeFilters }: ProductCardConta
 	}
 
 	if (products.length > 0){
+		let nbPages = Math.ceil((productData?.count ?? 0) / 5);
+		let pagination = 
+		<Box sx={{ bottom: 0, display: 'flex', justifyContent: 'center', marginTop: '1em'}}>
+			<Pagination count={nbPages} variant="outlined" shape="rounded" onChange={(e, page) => handlePageChange(page)} page={page}/>
+		</Box>;
+
+		if (nbPages <= 1){
+			pagination = <></>;
+		}
 		return (
-			<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
-			{products.map((product) => {
-				return <ProductCard product={product} />
-			})}
-			</Box>
+			<>
+				<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 5, alignItems: 'stretch' }}>
+				{products.map((product) => {
+					return <ProductCard product={product} />
+				})}
+				</Box>
+				{pagination}
+			</>
 		);
 	}
 	else {

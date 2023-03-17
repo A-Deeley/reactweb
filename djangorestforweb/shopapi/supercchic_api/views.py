@@ -55,24 +55,29 @@ class ReactCartUpdateRow(ReactApiView):
 		cart = self.getUserCart(request)		
 		
 		product = models.Products.objects.filter(id=bodyJson['product']).first()
+		existingRow = cart.rows.filter(panier_id=cart.id, product_id=product).first()
 
 		
 		if (product is None):
 			return Response(status=status.HTTP_404_NOT_FOUND)
+		
 
 
-		existingRow = cart.rows.filter(panier_id=cart.id, product_id=product).first()
 		
 		if (existingRow is None):
 			print("adding non-existing row")
 			existingRow = models.PanierRow(
 				panier = cart,
 				product_id = product.id,
-				quantity = bodyJson['quantity']
+				quantity = 0
 			)
-		else:
-			print("updating existing row")
-			existingRow.quantity += bodyJson['quantity']
+
+
+		if (product.qty <= 0 or product.qty < bodyJson['quantity'] + existingRow.quantity):
+			print('not enough stock')
+			return Response(status=status.HTTP_406_NOT_ACCEPTABLE, data='not enough stock')
+		
+		existingRow.quantity += bodyJson['quantity']
 
 		existingRow.save()
 		cart.save()
@@ -83,8 +88,8 @@ class ReactGetAllRows(ReactApiView):
 	def get(self, request):
 
 		cart = self.getUserCart(request)
-
 		cartRows = cart.rows.all()
+		print(cartRows)
 		serializer = serializers.CartRowSerializer(cartRows.all().order_by('-quantity'), many=True)
 		#products = models.Products.objects.filter(id__in=product_ids)
 

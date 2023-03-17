@@ -3,6 +3,7 @@ import { IAuthData } from '../Interfaces/IUserData';
 
 const baseURL = 'http://localhost:8000/';
 const headerToken = 'Bearer ';
+export const storageAccessToken = 'demo_access_token';
 
 const axiosInstance = axios.create({
   baseURL,

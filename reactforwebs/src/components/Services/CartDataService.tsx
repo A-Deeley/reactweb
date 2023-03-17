@@ -13,7 +13,7 @@ const get = (): Promise<AxiosResponse<CartRow[]>> =>
 
 const updateRow = (productId: number, qty: number): Promise<AxiosResponse<Cart>> =>{
 
-    return axiosInstance.post<unknown, AxiosResponse<Cart>>(`${rootPath}/editRow`, {product: productId, quantity: qty});
+    return axiosInstance.post<unknown, AxiosResponse<Cart>>(`${rootPath}/updateRow`, {product: productId, quantity: qty});
 }
 
 const removeProduct = (rowId: number): Promise<AxiosResponse<CartRow[]>> => {

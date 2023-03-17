@@ -84,7 +84,7 @@ export default function Filters({ onFiltersChanged }: FilterProps) {
 
         const newFilters: IFilters = {
             departmentFilters: checkedDepartments,
-            priceRange: priceFilters,
+            promoFilter: null
         }
         onFiltersChanged(newFilters);
     }

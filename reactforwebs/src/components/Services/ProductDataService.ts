@@ -5,8 +5,8 @@ import Product from '../Interfaces/Product';
 
 const rootPath = 'shop/products';
 
-const getAll = (): Promise<AxiosResponse<IProductData>> =>
-    axiosInstance.get<unknown, AxiosResponse<IProductData>>(rootPath);
+const getAll = (pageNo: number): Promise<AxiosResponse<IProductData>> =>
+    axiosInstance.get<unknown, AxiosResponse<IProductData>>(`${rootPath}/?page=${pageNo}`);
 
 const getFiltered = (filters: string): Promise<AxiosResponse<IProductData>> =>
     axiosInstance.post<unknown, AxiosResponse<IProductData>>(`${rootPath}`, filters);

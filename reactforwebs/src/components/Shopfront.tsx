@@ -43,7 +43,7 @@ export const Shopfront = () => {
 				<Filters onFiltersChanged={onFiltersChanged} />
 			</Grid>
 			<Grid xs={10}>
-				<ProductContainer activeFilters={filters} />
+				<ProductContainer activeFilters={filters} priceFilters={[1,100]}/>
 			</Grid>
 		</Grid>
 		

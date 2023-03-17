@@ -10,6 +10,10 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import LoginIcon from '@mui/icons-material/Login';
 import CartDataService from './Services/CartDataService';
 import { SnackbarProvider, useSnackbar } from 'notistack'
+import BadgeContext, { ICartBadgeContext } from './Context/CartBadgeContext';
+import { useContext, useState } from 'react';
+import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
+import ProductDataService from './Services/ProductDataService';
 
 export type ProductCardProps = {
 	product: IProductData
@@ -17,8 +21,9 @@ export type ProductCardProps = {
 
 export default function ProductCard({ product }: ProductCardProps): JSX.Element {
 
-	console.log(product.image_url);
+	const badgeContext: ICartBadgeContext = useContext(BadgeContext);
 	const navigate: NavigateFunction = useNavigate();
+	const [outOfStock, setOutOfStock] = useState<boolean>(product.qty <= 0);
 	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 	const userToken: string | null = localStorage.getItem('demo_access_token');
 	const moneyFormatter = new Intl.NumberFormat('en-CA', {
@@ -26,8 +31,8 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 		currency: 'CAD',
 	})
 
-	let realPrice = <Box sx={{ height: '100%'}}><Typography display="inline" sx={{ color: 'white'}}>.</Typography><Typography>{moneyFormatter.format(product.price)}</Typography></Box>;
-	const secondaryText = product.secondary_name.length > 0 ? <Typography sx={{ whiteSpace: 'nowrap', paddingInline: '1em', color: 'grey' }}>{product.secondary_name}</Typography> : <></>;
+	let realPrice = <Box><Typography display="inline" sx={{ color: 'white'}}>.</Typography><Typography>{moneyFormatter.format(product.price)}</Typography></Box>;
+	const secondaryText = product.secondary_name.length > 0 ? <Typography sx={{ whiteSpace: 'wrap', paddingInline: '1em', color: 'grey', flexGrow: '1' }}>{product.secondary_name}</Typography> : <></>;
 
 	if (product.discount_type == 1){
 		realPrice = 
@@ -54,34 +59,81 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 
 	const handleAddToCartClick = () => {
 		console.log(`Adding product to the cart.`, product);
-		CartDataService.updateRow(product.id, 1).then((response) => console.log("success", response)).catch((err) => console.log(err));
-		enqueueSnackbar(`${product.name} ajouté au panier!`,  {variant: "success"});
+		let productStillInStock: boolean | null = true;
+		ProductDataService.get(product.id)
+		.then((response) => {
+			const responseProduct = response.data;
+			productStillInStock = responseProduct.qty > 0;
+		})
+		.catch((err) => {
+			console.log("error checking product inventory. ", err);
+			enqueueSnackbar("Une érreur est survenu. Réessayez plus tard.", { variant: 'error'});
+			productStillInStock = null;
+		})
+
+		if (!productStillInStock){
+			enqueueSnackbar(`${product.name} n'est plus en stock, désolé.`, { variant: 'warning'});
+			return;
+		}
+
+		CartDataService.updateRow(product.id, 1)
+		.then((response) => {
+			console.log("success", response)
+			badgeContext.update(1);
+			enqueueSnackbar(`${product.name} ajouté au panier!`,  {variant: "success"});
+		})
+		.catch((err) => {
+			if (err.response.status === 406){
+				enqueueSnackbar(`${product.name} n'est plus en stock, désolé.`, { variant: 'warning'});
+				setOutOfStock(true);
+			}
+		});
 	}
 
 
-	const btn = (userToken === null)
-	? <Card variant="outlined" key={product.id} sx={{ width: '200px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
-	<CardActionArea sx={{ height: '100%'}} onClick={handleViewClick}>
-		<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`http://localhost:8000${product.image_url}`}/>
-		<Typography variant='h6' sx={{textWrap: 'wrap' }}>{product.name}</Typography>
-		{secondaryText}
-		{realPrice}
-	</CardActionArea>
-</Card>
-:
-<Card variant="outlined" key={product.id} sx={{ width: '200px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
-			<CardActionArea sx={{ height: '100%'}} onClick={handleViewClick}>
+	let card = 
+	<Card variant="outlined" key={product.id} sx={{ width: '200px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+		<CardActionArea sx={{ height: '100%'}} onClick={handleViewClick}>
+			<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`http://localhost:8000${product.image_url}`}/>
+			<Typography variant='h6' sx={{textWrap: 'wrap' }}>{product.name}</Typography>
+			{secondaryText}
+			{realPrice}
+		</CardActionArea>
+	</Card>;
+
+	if (userToken !== null){
+		card = 
+		<Card variant="outlined" key={product.id} sx={{ display: 'flex', maxWidth: '15%', flexDirection: 'column', justifyContent: 'space-between'}}>
+			<CardActionArea sx={{ flexGrow: 1}} onClick={handleViewClick}>
 				<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`http://localhost:8000${product.image_url}`}/>
 				<Typography variant='h6' sx={{textWrap: 'wrap' }}>{product.name}</Typography>
 				{secondaryText}
 				{realPrice}
 			</CardActionArea>
 			<Tooltip title="Ajouter au panier">
-				<Button onClick={handleAddToCartClick} sx={{ backgroundColor: '#ed3024', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '50px', ":hover": { backgroundColor: '#b51a10'}}}>
+				<Button onClick={handleAddToCartClick} sx={{ backgroundColor: '#ed3024', display: 'flex', justifyContent: 'center', height: '3rem', ":hover": { backgroundColor: '#b51a10'}}}>
 					<span style={{ color: 'white'}}>Ajouter</span><AddShoppingCartIcon sx={{ color: '#FDD100'}}/>
 				</Button>
 			</Tooltip>
 		</Card>;
 
-	return btn;
+		if (outOfStock){
+			card = 
+			<Card variant="outlined" key={product.id} sx={{ display: 'flex', maxWidth: '15%', flexDirection: 'column', justifyContent: 'space-between'}}>
+				<CardActionArea sx={{ flexGrow: 1}} onClick={handleViewClick}>
+					<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`http://localhost:8000${product.image_url}`}/>
+					<Typography variant='h6' sx={{textWrap: 'wrap' }}>{product.name}</Typography>
+					{secondaryText}
+					{realPrice}
+				</CardActionArea>
+				<Tooltip title="Produit non disponible">
+					<Button sx={{ backgroundColor: 'darkGrey', display: 'flex', justifyContent: 'center', height: '3rem', ":hover": { backgroundColor: 'grey'}}}>
+						<span style={{ color: 'white'}}>Hors stock</span><RemoveShoppingCartIcon sx={{ color: 'red'}}/>
+					</Button>
+				</Tooltip>
+			</Card>;
+		}
+	}
+
+	return card;
 }
