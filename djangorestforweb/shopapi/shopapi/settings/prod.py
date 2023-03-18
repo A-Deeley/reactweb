@@ -9,3 +9,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+CORS_ORIGIN_WHITELIST = (
+    'https://shopapi.web4.lesbiscuits.ca',
+)

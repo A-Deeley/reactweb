@@ -3,10 +3,10 @@ import axiosInstance from './Axios';
 import Department from '../Interfaces/Department';
 import IDepartmentData from '../Interfaces/IDepartmentData';
 
-const rootPath = 'shop/departments';
+const rootPath = 'shop/departments/';
 
-const getAll = (): Promise<AxiosResponse<IDepartmentData>> =>
-    axiosInstance.get<unknown, AxiosResponse<IDepartmentData>>(rootPath);
+const getAll = (): Promise<AxiosResponse<Department[]>> =>
+    axiosInstance.get<unknown, AxiosResponse<Department[]>>(rootPath);
 
 const get = (id: number): Promise<AxiosResponse<Department>> =>
     axiosInstance.get<unknown, AxiosResponse<Department>>(`${rootPath}/${id}`);

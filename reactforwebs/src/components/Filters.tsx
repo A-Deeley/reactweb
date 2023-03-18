@@ -30,21 +30,32 @@ export default function Filters({ onFiltersChanged }: FilterProps) {
     const [loading, setLoading] = useState(true);
     const [filterBoxes, setFilterBoxes] = React.useState<FilterBox[]>([]);
     const [priceFilters, setPriceFilters] = useState<number[]>([0, 100]);
+    const [promo, setPromo] = useState<boolean>(false);
     const [marks, setMarks] = useState<Mark[]>([]);
+    const maxPrice = 50;
+    const moneyFormatter = new Intl.NumberFormat('en-CA', {
+		style: 'currency',
+		currency: 'CAD',
+        maximumFractionDigits: 0,
+	})
 
     useEffect(() => {
-        const newMarks = [...marks];
-        for (let i = 0; i <= 10; i+=2) {
+        sliderCache = [...priceFilters];
+        const newMarks = [];
+        const increment = 5;
+        for (let i = 0; i <= maxPrice; i+=increment) {
             newMarks.push({
-                value: i * 10,
-                label: `${i * 10}`
+                value: (i / maxPrice) * 100,
+                label: `${i}`
             });
         }
+        console.log("finished setting marks", newMarks);
         setMarks(newMarks);
         DepartmentDataService.getAll()
             .then((response) => {
+                console.log("loading departements", response.data);
                 const filterItems: FilterBox[] = [];
-                if (response.data.results.length === 0) {
+                if (response.data.length === 0) {
                     return;
                 }
 
@@ -53,7 +64,7 @@ export default function Filters({ onFiltersChanged }: FilterProps) {
                     dept: { id: 0, name: "Afficher tout" },
                     isChecked: true,
                 });
-                response.data.results.forEach((department) => {
+                response.data.forEach((department) => {
                     filterItems.push({
                         dept: department,
                         isChecked: department.id === 0,
@@ -69,8 +80,9 @@ export default function Filters({ onFiltersChanged }: FilterProps) {
             });
     }, []);
 
+    let sliderCache: number[] = [...priceFilters];
     const handlePriceSlider = (event: Event, newValue: number | number[]) => {
-        setPriceFilters(newValue as number[]);        
+        setPriceFilters(newValue as number[]);
     }
 
     const onApplyClicked = () => {
@@ -82,10 +94,15 @@ export default function Filters({ onFiltersChanged }: FilterProps) {
             }
         }
 
+        const minPrice = (priceFilters[0] / 100) * maxPrice;
+        const _maxPrice = (priceFilters[1] / 100) * maxPrice;
+
         const newFilters: IFilters = {
+            type: "IFilter",
             departmentFilters: checkedDepartments,
-            promoFilter: null
-        }
+            promoFilter: promo,
+            minMaxPrice: [minPrice, _maxPrice],
+        };
         onFiltersChanged(newFilters);
     }
 
@@ -103,6 +120,11 @@ export default function Filters({ onFiltersChanged }: FilterProps) {
         }
 
         setFilterBoxes(fb);
+    };
+
+    const handleTogglePromo = () => {
+        const currentState = promo;
+        setPromo(!currentState);
     };
 
     if (loading) {
@@ -153,25 +175,21 @@ export default function Filters({ onFiltersChanged }: FilterProps) {
                         );
                     })}
                 </List>
-                <Divider textAlign="left"><Typography sx={{ fontWeight: 'bold' }} >Promotions</Typography></Divider>
+                <Divider textAlign="left"><Typography sx={{ fontWeight: 'bold' }}>Promotions</Typography></Divider>
                 <List dense sx={{ paddingTop: 0}}>
                     <ListItem disablePadding>
                         <Checkbox 
-                            style={{ padding: 0, color: '#00994c' }}/>
+                            style={{ padding: 0, color: '#00994c' }}
+                            onChange={handleTogglePromo}
+                            checked={promo}
+                            />
                         <ListItemButton>
                             <ListItemText sx={{ fontWeight: 'bold' }} id="promo" primary="En promotion" />
                         </ListItemButton>
                     </ListItem>
-                    <ListItem disablePadding>
-                        <Checkbox 
-                            style={{ padding: 0, color: '#00994c' }}/>
-                        <ListItemButton>
-                            <ListItemText sx={{ fontWeight: 'bold' }} id="no_promo" primary="Pas en promotion" />
-                        </ListItemButton>
-                    </ListItem>
                 </List>
                 <Divider textAlign="left"><Typography sx={{ textAlign: 'start', fontWeight: 'bold' }}>Prix ($)</Typography></Divider>
-                <Slider valueLabelDisplay="auto" style={{ marginTop: 5, height: 8, width: '90%', color: '#00994c' }} value={priceFilters} valueLabelFormat={value => <div>${value}</div>} onChange={handlePriceSlider} marks={marks}/>
+                <Slider valueLabelDisplay="auto" style={{ marginTop: 5, height: 8, width: '90%', color: '#00994c' }} valueLabelFormat={value => <div>{moneyFormatter.format((value / 100) * maxPrice)}</div>} value={sliderCache} onChange={handlePriceSlider} marks={marks}/>
                 <Button variant="contained" onClick={onApplyClicked} sx={{ backgroundColor: '#ed3024', ':hover': { backgroundColor: '#b51a10'}}}>Appliquer</Button>
             </Box>
         );
@@ -181,8 +199,8 @@ export default function Filters({ onFiltersChanged }: FilterProps) {
             <Box sx={{ width: '100%', maxWidth: 360 }}>
                 <Divider textAlign="left"><Typography sx={{ textAlign: 'start', fontWeight: 'bold' }}>Aucun départements trouvés</Typography></Divider>
                 <Divider textAlign="left"><Typography sx={{ textAlign: 'start', fontWeight: 'bold' }}>Prix ($)</Typography></Divider>
-                <Slider valueLabelDisplay="auto" style={{ marginTop: 5, height: 8, width: '90%', color: '#00994c' }} value={priceFilters} valueLabelFormat={value => <div>${value}</div>} onChange={handlePriceSlider} marks={marks}/>
-                <Button variant="contained" onClick={onApplyClicked} sx={{ backgroundColor: '#ed3024', ':hover': { backgroundColor: '#b51a10'}}}>Appliquer</Button>
+                <Slider valueLabelDisplay="auto" style={{ marginTop: 5, height: 8, width: '90%', color: '#00994c' }} valueLabelFormat={value => <div>{moneyFormatter.format((value / 100) * maxPrice)}</div>} value={sliderCache} onChange={handlePriceSlider} marks={marks}/>
+                <Button variant="contained" sx={{ backgroundColor: '#ed3024', ':hover': { backgroundColor: '#b51a10'}}}>Appliquer</Button>
             </Box>
             );
     }

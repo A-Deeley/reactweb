@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { IAuthData } from '../Interfaces/IUserData';
 
-const baseURL = 'http://localhost:8000/';
+export const baseURL = (process.env.NODE_ENV === 'development') ? 'http://localhost:8000/' : 'https://shopapi.web4.lesbiscuits.ca';
 const headerToken = 'Bearer ';
 export const storageAccessToken = 'demo_access_token';
 

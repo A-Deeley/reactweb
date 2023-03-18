@@ -12,6 +12,7 @@ import CartDataService from './Services/CartDataService';
 import { SnackbarProvider, useSnackbar } from 'notistack'
 import BadgeContext, { ICartBadgeContext } from './Context/CartBadgeContext';
 import { useContext, useState } from 'react';
+import { baseURL } from './Services/Axios';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import ProductDataService from './Services/ProductDataService';
 
@@ -94,7 +95,7 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 	let card = 
 	<Card variant="outlined" key={product.id} sx={{ width: '200px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
 		<CardActionArea sx={{ height: '100%'}} onClick={handleViewClick}>
-			<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`http://localhost:8000${product.image_url}`}/>
+			<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`${baseURL}${product.image_url}`}/>
 			<Typography variant='h6' sx={{textWrap: 'wrap' }}>{product.name}</Typography>
 			{secondaryText}
 			{realPrice}
@@ -105,7 +106,7 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 		card = 
 		<Card variant="outlined" key={product.id} sx={{ display: 'flex', maxWidth: '15%', flexDirection: 'column', justifyContent: 'space-between'}}>
 			<CardActionArea sx={{ flexGrow: 1}} onClick={handleViewClick}>
-				<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`http://localhost:8000${product.image_url}`}/>
+				<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`${baseURL}${product.image_url}`}/>
 				<Typography variant='h6' sx={{textWrap: 'wrap' }}>{product.name}</Typography>
 				{secondaryText}
 				{realPrice}
@@ -121,7 +122,7 @@ export default function ProductCard({ product }: ProductCardProps): JSX.Element 
 			card = 
 			<Card variant="outlined" key={product.id} sx={{ display: 'flex', maxWidth: '15%', flexDirection: 'column', justifyContent: 'space-between'}}>
 				<CardActionArea sx={{ flexGrow: 1}} onClick={handleViewClick}>
-					<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`http://localhost:8000${product.image_url}`}/>
+					<CardMedia sx={{ objectFit: 'contain'}} component="img" image={`${baseURL}${product.image_url}`}/>
 					<Typography variant='h6' sx={{textWrap: 'wrap' }}>{product.name}</Typography>
 					{secondaryText}
 					{realPrice}

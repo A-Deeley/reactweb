@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework.settings import api_settings
 from rest_framework import status
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
@@ -8,14 +9,62 @@ from . import models, serializers
 
 # Create your views here.
 class ProductViewSet(viewsets.ModelViewSet):
-	queryset = models.Products.objects.all().order_by('id')
+	def get_queryset(self):
+		requestIds = self.request.query_params.get('id')
+		requestPromos = self.request.query_params.get('promo')
+		requestMinPrice = self.request.query_params.get('min')
+		requestMaxPrice = self.request.query_params.get('max')
+
+		queryset = models.Products.objects.all()
+		if (requestIds is not None):
+			deptIds = requestIds.split(',')
+			print("got the following ids: " + str(deptIds))
+			queryset = queryset.filter(department_id__in=deptIds)
+
+		if (requestPromos is not None):
+			filterPromos = requestPromos == "1"
+			if (filterPromos):
+				print("got filter promos")
+				queryset = queryset.filter(discount_type__gt=0)
+
+		if (requestMinPrice is not None):
+			try:
+				minPrice = float(requestMinPrice)
+				print("(" + str(requestMinPrice) + ") got min price: " + str(minPrice))
+				queryset = queryset.filter(price__gte=minPrice)
+			except:
+				print("invalid min price received")
+
+		if (requestMaxPrice is not None):
+			try:
+				maxPrice = float(requestMaxPrice)
+				print("(" + str(requestMaxPrice) + ") got max price: " + str(maxPrice))
+				queryset = queryset.filter(price__lte=maxPrice)
+			except:
+				print("invalid max price received")
+
+		
+		return queryset
+
 	serializer_class = serializers.ProductSerializer
-	permission_classes = [permissions.AllowAny]
+	permission_classes = [permissions.AllowAny]	
+
 
 class DepartmentViewSet(viewsets.ModelViewSet):
 	queryset = models.Departments.objects.all().order_by('id')
 	serializer_class = serializers.DepartmentSerializer
 	permission_classes = [permissions.AllowAny]
+	pagination_class = None
+
+	def paginate_queryset(self, queryset):
+		"""
+		Return a single page of results, or `None` if pagination is disabled.
+		"""
+
+		if 'page' not in self.request.query_params:
+			return None
+		
+		return super().paginate_queryset(queryset)
 
 
 class CompanyViewSet(viewsets.ModelViewSet):
@@ -43,7 +92,6 @@ class ReactApiView(APIView):
 
 		return cart
 	
-
 
 class ReactCartUpdateRow(ReactApiView):
 	permission_classes= [permissions.AllowAny]
@@ -91,7 +139,6 @@ class ReactGetAllRows(ReactApiView):
 		cartRows = cart.rows.all()
 		print(cartRows)
 		serializer = serializers.CartRowSerializer(cartRows.all().order_by('-quantity'), many=True)
-		#products = models.Products.objects.filter(id__in=product_ids)
 
 		return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -17,7 +17,7 @@ import { green } from '@mui/material/colors';
 
 export const Shopfront = () => {
 	console.log("initialising shopfront...");
-	const [filters, setFilters] = useState<IFilters>();
+	const [filters, setFilters] = useState<IFilters | null>(null);
 	const userToken: string | null = localStorage.getItem('demo_access_token');
 
 	const onFiltersChanged = (newFilters: IFilters) => {
@@ -43,7 +43,7 @@ export const Shopfront = () => {
 				<Filters onFiltersChanged={onFiltersChanged} />
 			</Grid>
 			<Grid xs={10}>
-				<ProductContainer activeFilters={filters} priceFilters={[1,100]}/>
+				<ProductContainer activeFilters={filters}/>
 			</Grid>
 		</Grid>
 		

@@ -23,13 +23,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-a-2hzq&2)4=@b_#d+*6n_ap$6vu%x!zf!)_@e5&b91yhyqmwl&'
 
-
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-)
-
-
 # Application definition
 
 INSTALLED_APPS = [

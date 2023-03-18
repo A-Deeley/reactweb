@@ -9,6 +9,7 @@ import StoreIcon from '@mui/icons-material/Store';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CheckIcon from '@mui/icons-material/Check';
 import BadgeContext, { ICartBadgeContext } from "./Context/CartBadgeContext";
+import { baseURL } from "./Services/Axios";
 import ProductDataService from "./Services/ProductDataService";
 
 export interface CartContentProps {
@@ -151,7 +152,7 @@ export default function CartContents({cart, handleCartUpdate} : CartContentProps
                             <>
                             <Grid key={row.id} container sx={{ marginBlock: '1em', textAlign: 'start' }}>
                                 <Grid xs={2}>
-                                    <img alt={`product_${row.product.name}`} src={`http://localhost:8000${row.product.image_url}`} style={{ maxWidth: '100%'}}/>
+                                    <img alt={`product_${row.product.name}`} src={`${baseURL}${row.product.image_url}`} style={{ maxWidth: '100%'}}/>
                                 </Grid>
                                 <Grid container xs={10}>
                                     <Grid xs={4} style={{ marginTop: '0'}}>

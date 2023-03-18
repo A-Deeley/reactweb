@@ -14,15 +14,13 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import IProductData from './Interfaces/IProductData';
 
 export type ProductCardContainerProps = {
-	priceFilters: number[],
 	activeFilters: IFilters | undefined | null,
 }
 
 // Load product data here with getFiltered(string json);
 
 
-export default function ProductCardContainer({ activeFilters, priceFilters }: ProductCardContainerProps) {
-	const productsNoPriceFilterCache = useRef<Product[]>([]);
+export default function ProductCardContainer({ activeFilters }: ProductCardContainerProps) {
 	const [products, setProduct] = useState<Product[]>([]);
 	const [page, setPage] = useState<number>(1);
 	const [loading, setLoading] = useState<boolean>(true);
@@ -30,12 +28,11 @@ export default function ProductCardContainer({ activeFilters, priceFilters }: Pr
 	const navigate: NavigateFunction = useNavigate();
 
 	useEffect(() => {
-		if (activeFilters === null || activeFilters === undefined) {
+		if (activeFilters === null){
 			ProductDataService.getAll(page)
 				.then((response) => {
-					console.log('Product data loaded', response.data);
+					console.log('Product data loaded', response);
 					setProductData(response.data);
-					productsNoPriceFilterCache.current = response.data.results;
 					setProduct(response.data.results);
 				})
 				.catch((err) => {
@@ -44,43 +41,46 @@ export default function ProductCardContainer({ activeFilters, priceFilters }: Pr
 				.finally(() => {
 					setLoading(false);
 				});
+		} else {
+			setLoading(true);
+			ProductDataService.getFiltered(activeFilters, page)
+				.then((response) =>{
+					console.log("finished loading filtered queryset", response.data);
+					setProductData(response.data);
+					setProduct(response.data.results);
+				})
+				.catch((err) => {
+					console.log("error: error loading filtered queryset.", err); 
+				})
+				.finally(() => setLoading(false));
 		}
-		else {
-			if (activeFilters !== null && activeFilters !== undefined) {
-				if (activeFilters.departmentFilters.findIndex(dept => dept.id === 0) > -1) {
-					ProductDataService.getAll(page)
-						.then((response) => {
-							console.log('Product data loaded', response.data);
-							productsNoPriceFilterCache.current = response.data.results;
-							setProduct(productsNoPriceFilterCache.current.filter(item => item.price <= priceFilters[priceFilters.length - 1] && item.price >= priceFilters[0]));
-						})
-						.catch((err) => {
-							console.log('ERROR: An error occurred while category data loading', err, err.response);
-						})
-						.finally(() => {
-							setLoading(false);
-						});
-				}
-				else {
-					setProduct(productsNoPriceFilterCache.current.filter(item => item.price <= priceFilters[priceFilters.length - 1] && item.price >= priceFilters[0]));
-				}
-			}
-		}
-	}, [activeFilters, priceFilters]);
+	}, [activeFilters]);
 
 	const handlePageChange = (page: number) => {
 		setPage(page);
 		console.log(page);
-		ProductDataService.getAll(page)
-				.then((response) => {
-					console.log('Product data loaded', response.data);
+		if (activeFilters === null){
+			ProductDataService.getAll(page)
+					.then((response) => {
+						console.log('Product data loaded', response.data);
+						setProductData(response.data);
+						setProduct(response.data.results);
+					})
+					.catch((err) => {
+						console.log('ERROR: An error occurred while category data loading', err, err.response);
+					});
+		}
+		else{
+			ProductDataService.getFiltered(activeFilters, page)
+				.then((response) =>{
+					console.log("finished loading filtered queryset", response.data);
 					setProductData(response.data);
-					productsNoPriceFilterCache.current = response.data.results;
 					setProduct(response.data.results);
 				})
 				.catch((err) => {
-					console.log('ERROR: An error occurred while category data loading', err, err.response);
+					console.log("error: error loading filtered queryset.", err); 
 				});
+		}
 	}
 	
 
